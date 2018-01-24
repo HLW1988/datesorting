@@ -9,14 +9,7 @@
 using namespace std;
 
 
-
-
-
-
-
-
-
-
+int ss;
 
 /*void main()
 {
