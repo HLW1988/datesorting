@@ -112,13 +112,23 @@ void main()
 			read_ahead(sp1,sr1,tn1,time1,sgyfiles1[i]);
 			read_ahead(sp2,sr2,tn2,time2,sgyfiles2[j]);
 			read_ahead(sp3,sr3,tn3,time3,sgyfiles3[k]);
-			if(*time1>(mintime+10000))
+			if(*time1>(mintime+10000)||i>=size1)                           //第一口井
 			{
 				for(int l=0;l<ntn1;l++)
 					for(int m=0;m<nsp1;m++)
 						outdata[l][m]=0.0;
 				i=i+1;
-			}			
+			}
+
+			else if(*time1=mintime)
+			{
+				input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
+				for(int l=0;l<ntn1;l++)
+					for(int m=0;m<nsp1;m++)
+						outdata[l][m]=data1[l][m];
+				i=i+1;
+			}
+
 			else
 			{
 				input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
@@ -131,10 +141,79 @@ void main()
 				for(int n=0;n<ntn1;n++)
 					for(int m=(nsp1-l);m<nsp1;m++)
 						outdata[n][m]=data1[n][m-nsp1+l];
+			}
 
 
+			//第二口井
+
+			if(*time2>(mintime+10000)||j>=size2)                           //第一口井
+			{
+				for(int l=ntn1;l<ntn1+ntn2;l++)
+					for(int m=0;m<nsp1;m++)
+						outdata[l][m]=0.0;
+				j=j+1;
+			}
+
+			else if(*time1=mintime)
+			{
+				input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles1[j]);
+				for(int l=ntn1;l<ntn1+ntn2;l++)
+					for(int m=0;m<nsp1;m++)
+						outdata[l][m]=data1[l][m];
+				j=i+1;
+			}
+
+			else
+			{
+				input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles1[j]);
+				int l=int((*time1-mintime)/0.25);
+				for(int n=ntn1;n<ntn1+ntn2;n++)
+					for(int m=0;m<(nsp1-l);m++)
+						outdata[n][m]=data1[n][l+m];
+				j=j+1;
+				input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles1[j]);
+				for(int n=ntn1;n<ntn1+ntn2;n++)
+					for(int m=(nsp1-l);m<nsp1;m++)
+						outdata[n][m]=data1[n][m-nsp1+l];
+			}
+
+			//第三口井
+
+			if(*time2>(mintime+10000)||k>=size3)                           
+			{
+				for(int l=ntn1+ntn2;l<ntn1+ntn2+ntn3;l++)
+					for(int m=0;m<nsp1;m++)
+						outdata[l][m]=0.0;
+				k=k+1;
+			}
+
+			else if(*time1=mintime)
+			{
+				input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles1[k]);
+				for(int l=ntn1+ntn2;l<ntn1+ntn2+ntn3;l++)
+					for(int m=0;m<nsp1;m++)
+						outdata[l][m]=data1[l][m];
+				k=k+1;
+			}
+
+			else
+			{
+				input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[j]);
+				int l=int((*time1-mintime)/0.25);
+				for(int n=ntn1+ntn2;n<ntn1+ntn2+ntn3;n++)
+					for(int m=0;m<(nsp1-l);m++)
+						outdata[n][m]=data1[n][l+m];
+				j=j+1;
+				input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[j]);
+				for(int n=ntn1+ntn2;n<ntn1+ntn2+ntn3;n++)
+					for(int m=(nsp1-l);m<nsp1;m++)
+						outdata[n][m]=data1[n][m-nsp1+l];
 			}
 			
+			mintime=mintime+10000;
+
+
+		
 		}
 	
 
