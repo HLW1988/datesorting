@@ -1,15 +1,13 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include "swapbyte.h"
 #include "getfilename.h"
 #include "IOsgy.h"
 using namespace std;
-
-
-int ss;
 
 /*void main()
 {
@@ -61,15 +59,19 @@ void array2D(float **p,int n1,int n2);
 void deletearray2D(float **p,int n1);
 void array3D(float ***p,int n1,int n2,int n3);
 void deletearray3D(float ***p,int n1,int n2);
-
-
+string i2s(int i,int len);
 
 void main()
 {
+	
+	
+	
+
 //	string filename;
 //	cout<<"请输入3井文件路径"<<endl;
 //	cin>>filename;
 	string filename1="H:/红87-2-8三井监测/红87-3-4监测/射孔",filename2="H:/红87-2-8三井监测/红87-3-8井监测/射孔",filename3="H:/红87-2-8三井监测/红87-6-12井监测/射孔";
+	string outfilename=;
 	vector<string>  sgyfiles1,sgyfiles2,sgyfiles3;
 	ifstream fin1,fin2,fin3;
 	traceheader *headfile1,*headfile2,*headfile3;
@@ -86,7 +88,7 @@ void main()
 	time1=&ntime1,time2=&ntime2,time3=&ntime3;
 
 
-	int i=0,j=0,k=0;                               //循环开始、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、
+	int i=0,j=0,k=0,o=1;                               //循环开始、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、
 
 	getAllFiles(filename1,sgyfiles1);              //读取文件名及路径
 	getAllFiles(filename2,sgyfiles2);
@@ -106,6 +108,7 @@ void main()
 	int size1=sgyfiles1.size();                   //文件个数
 	int size2=sgyfiles2.size();
 	int size3=sgyfiles3.size();
+	
 	
 	while(i<size1||j<size2||k<size3)
 		{ 
@@ -213,13 +216,13 @@ void main()
 			mintime=mintime+10000;
 
 
-		
+//			
 		}
 	
 
 
 }
-
+*/
 
 void array2D(float **p,int n1,int n2)
 {                                               
@@ -271,7 +274,13 @@ void deletearray3D(float ***p,int n1,int n2)
 
     
 }//end of deletearray3D()
-
+//数字转化为字符前面几位补零
+string i2s(int i, int len )
+{
+    stringstream ss;
+    ss << setw(len) << setfill('0') << i;
+    return ss.str();
+}
 
 
 
