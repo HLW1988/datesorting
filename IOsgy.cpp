@@ -48,7 +48,7 @@ void read_ahead(unsigned short *sp/*采样点数*/,unsigned short *sr/*采样率*/,shor
 //输入
 
 
-void input(traceheader *headfile/*道头*/,float **data/*数据*/,short **volume,short sampling_point/*采样点数*/,short sampling_rate/*采样间隔*/,short trace_num/*道数*/,string infilename/*文件名*/)
+void input(traceheader *headfile/*道头*/,float **data/*数据*/,short **volume,unsigned short sampling_point/*采样点数*/,unsigned short sampling_rate/*采样间隔*/,short trace_num/*道数*/,string infilename/*文件名*/)
 {
 	ifstream fin;
 	fin.open(infilename,ios::binary);
@@ -70,16 +70,16 @@ void input(traceheader *headfile/*道头*/,float **data/*数据*/,short **volume,sho
 
 //输出
 
-void output(traceheader *headfile/*道头*/,float **data/*数据*/,short **volume,short sampling_point/*采样点数*/,short sampling_rate/*采样间隔*/,short trace_num/*道数*/,string outfilename)
+void output(traceheader *headfile/*道头*/,float **data/*数据*/,short **volume,unsigned short sampling_point/*采样点数*/,unsigned short sampling_rate/*采样间隔*/,short trace_num/*道数*/,string outfilename)
 {
 	ofstream fout;
 		
 	fout.open(outfilename,ios::binary);
-	int i;
+	
 //	cout<<sampling_point<<endl;
-	for(i=0;i<trace_num;i++)
+	fout.write((char *)volume,3600);
+	for(int i=0;i<trace_num;i++)
 	{
-		fout.write((char *)volume,3600);
 		fout.write((char *)&(headfile[i]),240);
 		fout.write((char *)data[i],4*sampling_point);
 	}

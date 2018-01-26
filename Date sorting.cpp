@@ -71,11 +71,11 @@ void main()
 //	cout<<"请输入3井文件路径"<<endl;
 //	cin>>filename;
 	string filename1="H:/红87-2-8三井监测/红87-3-4监测/射孔",filename2="H:/红87-2-8三井监测/红87-3-8井监测/射孔",filename3="H:/红87-2-8三井监测/红87-6-12井监测/射孔";
-	string outfilename=;
+	string outfilename="H:/红87-2-8三井监测/合并";
+	string ss;
 	vector<string>  sgyfiles1,sgyfiles2,sgyfiles3;
 	ifstream fin1,fin2,fin3;
-	traceheader *headfile1,*headfile2,*headfile3;
-	char * outfile[10];
+	
 	unsigned short *sp1,*sp2,*sp3,*sr1,*sr2,*sr3; //采样点、采样率
 	unsigned short  nsp1,nsp2,nsp3,nsr1,nsr2,nsr3;
 	short *tn1,*tn2,*tn3,*volume[1800];//道数 ，时间
@@ -88,8 +88,8 @@ void main()
 	time1=&ntime1,time2=&ntime2,time3=&ntime3;
 
 
-	int i=0,j=0,k=0,o=1;                               //循环开始、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、
-
+	int i=0,j=0,k=0,o=1;                           //循环开始  
+	part2:
 	getAllFiles(filename1,sgyfiles1);              //读取文件名及路径
 	getAllFiles(filename2,sgyfiles2);
 	getAllFiles(filename3,sgyfiles3);
@@ -97,6 +97,8 @@ void main()
 	read_ahead(sp1,sr1,tn1,time1,sgyfiles1[0]);    //预读第一个文件采样点、采样间隔、道数、采样时间
 	read_ahead(sp2,sr2,tn2,time2,sgyfiles2[0]);
 	read_ahead(sp3,sr3,tn3,time3,sgyfiles3[0]);
+	traceheader *headfile1=new traceheader[ntn1],*headfile2=new traceheader[ntn2],*headfile3=new traceheader[ntn3],*outheadfile=new traceheader[ntn1+ntn2+ntn3];
+
 	temp=min(*time1,*time2);
 	mintime=min(temp,*time3);
 
@@ -115,114 +117,142 @@ void main()
 			read_ahead(sp1,sr1,tn1,time1,sgyfiles1[i]);
 			read_ahead(sp2,sr2,tn2,time2,sgyfiles2[j]);
 			read_ahead(sp3,sr3,tn3,time3,sgyfiles3[k]);
-			if(*time1>(mintime+10000)||i>=size1)                           //第一口井
+			if(ntime1==mintime||ntime2==mintime||ntime3==mintime)
 			{
-				for(int l=0;l<ntn1;l++)
-					for(int m=0;m<nsp1;m++)
-						outdata[l][m]=0.0;
-				i=i+1;
-			}
+				if(*time1>(mintime+10000)||i>=size1)                           //第一口井
+				{                                          
+					for(int l=0;l<ntn1;l++)
+						for(int m=0;m<nsp1;m++)
+							outdata[l][m]=0.0;
+					i=i+1;
+				}
 
 			else if(*time1=mintime)
-			{
-				input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
+				{
+					input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
+				
 				for(int l=0;l<ntn1;l++)
-					for(int m=0;m<nsp1;m++)
-						outdata[l][m]=data1[l][m];
+					{
+						outheadfile[l]=headfile1[0];
+						for(int m=0;m<nsp1;m++)
+							{
+								outdata[l][m]=data1[l][m];
+//							cout<<data1[l][m]<<endl;
+							}
+					}
 				i=i+1;
-			}
+				}
 
 			else
-			{
-				input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
-				int l=int((*time1-mintime)/0.25);
-				for(int n=0;n<ntn1;n++)
-					for(int m=0;m<(nsp1-l);m++)
-						outdata[n][m]=data1[n][l+m];
-				i=i+1;
-				input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
-				for(int n=0;n<ntn1;n++)
-					for(int m=(nsp1-l);m<nsp1;m++)
+				{
+					input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
+					int l=int((*time1-mintime)/0.25);
+					for(int n=0;n<ntn1;n++)
+						for(int m=0;m<(nsp1-l);m++)
+							outdata[n][m]=data1[n][l+m];
+					i=i+1;
+					input(headfile1,data1,volume,nsp1,nsr1,ntn1,sgyfiles1[i]);
+					for(int n=0;n<ntn1;n++)
+						for(int m=(nsp1-l);m<nsp1;m++)
 						outdata[n][m]=data1[n][m-nsp1+l];
-			}
+				}
 
 
 			//第二口井
 
 			if(*time2>(mintime+10000)||j>=size2)                           //第一口井
-			{
-				for(int l=ntn1;l<ntn1+ntn2;l++)
-					for(int m=0;m<nsp1;m++)
-						outdata[l][m]=0.0;
-				j=j+1;
-			}
+				{
+					for(int l=ntn1;l<ntn1+ntn2;l++)
+						for(int m=0;m<nsp1;m++)
+							outdata[l][m]=0.0;
+					j=j+1;
+				}
 
 			else if(*time1=mintime)
-			{
-				input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles1[j]);
-				for(int l=ntn1;l<ntn1+ntn2;l++)
-					for(int m=0;m<nsp1;m++)
-						outdata[l][m]=data1[l][m];
-				j=i+1;
-			}
+				{
+					input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles2[j]);
+					for(int l=ntn1;l<ntn1+ntn2;l++)
+					{
+						outheadfile[l]=headfile1[0];
+						for(int m=0;m<nsp1;m++)
+						{
+							outdata[l][m]=data2[l-ntn1][m];
+						
+						}
+					}
+					j=j+1;
+				}
 
 			else
-			{
-				input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles1[j]);
-				int l=int((*time1-mintime)/0.25);
-				for(int n=ntn1;n<ntn1+ntn2;n++)
-					for(int m=0;m<(nsp1-l);m++)
-						outdata[n][m]=data1[n][l+m];
-				j=j+1;
-				input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles1[j]);
-				for(int n=ntn1;n<ntn1+ntn2;n++)
-					for(int m=(nsp1-l);m<nsp1;m++)
-						outdata[n][m]=data1[n][m-nsp1+l];
-			}
+				{
+					input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles2[j]);
+					int l=int((*time1-mintime)/0.25);
+					for(int n=ntn1;n<ntn1+ntn2;n++)
+						for(int m=0;m<(nsp1-l);m++)
+							outdata[n][m]=data2[n-ntn1][l+m];
+					j=j+1;
+					input(headfile2,data2,volume,nsp2,nsr2,ntn2,sgyfiles2[j]);
+					for(int n=ntn1;n<ntn1+ntn2;n++)
+						for(int m=(nsp1-l);m<nsp1;m++)
+							outdata[n][m]=data2[n-ntn1][m-nsp1+l];
+				}
 
 			//第三口井
 
 			if(*time2>(mintime+10000)||k>=size3)                           
-			{
-				for(int l=ntn1+ntn2;l<ntn1+ntn2+ntn3;l++)
-					for(int m=0;m<nsp1;m++)
-						outdata[l][m]=0.0;
-				k=k+1;
-			}
+				{
+					for(int l=ntn1+ntn2;l<ntn1+ntn2+ntn3;l++)
+						for(int m=0;m<nsp1;m++)
+							outdata[l][m]=0.0;
+					k=k+1;
+				}
 
 			else if(*time1=mintime)
-			{
-				input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles1[k]);
-				for(int l=ntn1+ntn2;l<ntn1+ntn2+ntn3;l++)
-					for(int m=0;m<nsp1;m++)
-						outdata[l][m]=data1[l][m];
-				k=k+1;
-			}
+				{
+					input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[k]);
+					for(int l=ntn1+ntn2;l<ntn1+ntn2+ntn3;l++)
+					{
+						outheadfile[l]=headfile3[0];
+						for(int m=0;m<nsp1;m++)
+							outdata[l][m]=data3[l-ntn1-ntn2][m];
+					}
+					k=k+1;
+				}
 
-			else
-			{
-				input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[j]);
-				int l=int((*time1-mintime)/0.25);
-				for(int n=ntn1+ntn2;n<ntn1+ntn2+ntn3;n++)
-					for(int m=0;m<(nsp1-l);m++)
-						outdata[n][m]=data1[n][l+m];
-				j=j+1;
-				input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[j]);
-				for(int n=ntn1+ntn2;n<ntn1+ntn2+ntn3;n++)
-					for(int m=(nsp1-l);m<nsp1;m++)
-						outdata[n][m]=data1[n][m-nsp1+l];
-			}
-			
+				else
+				{
+					input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[k]);
+					int l=int((*time1-mintime)/0.25);
+					for(int n=ntn1+ntn2;n<ntn1+ntn2+ntn3;n++)
+						for(int m=0;m<(nsp1-l);m++)
+							outdata[n][m]=data3[n-ntn1-ntn2][l+m];
+					k=k+1;
+					input(headfile3,data3,volume,nsp3,nsr3,ntn3,sgyfiles3[k]);
+					for(int n=ntn1+ntn2;n<ntn1+ntn2+ntn3;n++)
+						for(int m=(nsp1-l);m<nsp1;m++)
+							outdata[n][m]=data3[n-ntn1-ntn2][m-nsp1+l];
+				}
+//			for(int p=0;p<(ntn1+ntn2+ntn3);p++)
+//				for(int q=0;q<nsp1;q++)
+//					cout<<outdata[p][q];
 			mintime=mintime+10000;
-
-
-//			
+			ss=i2s(o,6);
+			ss=outfilename+"/"+"File"+ss+".sgy";
+			cout<<ss<<endl;
+			output(outheadfile,outdata,volume,nsp1,nsr1,(ntn1+ntn2+ntn3),ss);         
+			o=o+1;
+//		
 		}
-	
+		
+		else
+		{
+			goto part2;
 
+		}
 
+	}
 }
-*/
+
 
 void array2D(float **p,int n1,int n2)
 {                                               
